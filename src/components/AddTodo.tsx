@@ -1,14 +1,14 @@
 import { useState, type FormEvent } from "react";
-import useTaskStore from "../hooks/useTaskStore";
+import useTaskStore from "../store/useTaskStore";
 
-export default function AddTodo() {
+export default function AddTodo({ date }: { date: string }) {
   const [text, setText] = useState("");
   const addTask = useTaskStore((state) => state.addTask);
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (text.trim()) {
-      addTask(text);
+      addTask(text, date);
       setText("");
     }
   };

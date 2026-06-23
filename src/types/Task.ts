@@ -2,12 +2,12 @@ export type Task = {
   id: string;
   text: string;
   completed: boolean;
-  dateCreated: Date;
+  date: string;
 };
 
 export type TaskStore = {
   tasks: Task[];
-  addTask: (text: string) => void;
+  addTask: (text: string, date: string) => void;
   deleteTask: (id: string) => void;
   toggleTask: (id: string) => void;
   moveTask: (id: string, newIndex: number) => void;

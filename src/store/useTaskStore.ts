@@ -4,7 +4,7 @@ import { type TaskStore } from "../types/Task";
 const useTaskStore = create<TaskStore>((set) => ({
   tasks: [],
 
-  addTask: (text) =>
+  addTask: (text, date) =>
     set((state) => ({
       tasks: [
         ...state.tasks,
@@ -12,7 +12,7 @@ const useTaskStore = create<TaskStore>((set) => ({
           text,
           completed: false,
           id: Date.now().toString(),
-          dateCreated: new Date(),
+          date,
         },
       ],
     })),

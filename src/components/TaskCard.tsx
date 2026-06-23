@@ -1,4 +1,4 @@
-import useTaskStore from "../hooks/useTaskStore";
+import useTaskStore from "../store/useTaskStore";
 import { motion } from "framer-motion";
 import { type Task } from "../types/Task";
 
@@ -28,7 +28,7 @@ export default function TaskCard({ task }: { task: Task }) {
       <span
         className={`flex-1 ml-2 ${task.completed ? "line-through text-gray-500" : ""}`}
       >
-        {task.text} / {task.dateCreated.toLocaleString()}
+        {task.text}
       </span>
       <button
         onClick={() => removeTask(task.id)}
