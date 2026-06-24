@@ -1,73 +1,107 @@
 import { create } from "zustand";
-import { type TaskStore } from "../types/Task";
+import { type ColumnKey, type TaskStore } from "../types/Task";
 
 const useTaskStore = create<TaskStore>((set) => ({
-  tasks: [],
+  tasks: {},
 
-  addTask: (text, date) =>
+  columns: {
+    yesterday: [],
+    today: [],
+    tomorrow: [],
+  },
+
+  // ✅ ADD TASK
+  addTask: (column, task) =>
     set((state) => ({
-      tasks: [
+      tasks: {
         ...state.tasks,
-        {
-          text,
-          completed: false,
-          id: Date.now().toString(),
-          date,
-        },
-      ],
+        [task.id]: task,
+      },
+      columns: {
+        ...state.columns,
+        [column]: [...state.columns[column], task.id],
+      },
     })),
 
+  // ✅ DELETE TASK
   deleteTask: (id) =>
-    set((state) => ({
-      tasks: state.tasks.filter((task) => task.id !== id),
-    })),
-
-  toggleTask: (id) =>
-    set((state) => ({
-      tasks: state.tasks.map((task) =>
-        task.id === id ? { ...task, completed: !task.completed } : task,
-      ),
-    })),
-
-  moveTask: (id, newDate, newIndex) =>
     set((state) => {
-      const tasks = [...state.tasks];
+      const columns = Object.fromEntries(
+        Object.entries(state.columns).map(([key, ids]) => [
+          key,
+          ids.filter((taskId) => taskId !== id),
+        ]),
+      ) as TaskStore["columns"];
 
-      // Remove Task from old position
-      const oldIndex = tasks.findIndex((task) => task.id === id);
-      if (oldIndex === -1) return state; // Task not found
+      const tasks = { ...state.tasks };
+      delete tasks[id];
 
-      const [task] = tasks.splice(oldIndex, 1);
+      return { columns, tasks };
+    }),
 
-      const fromDate = task.date;
+  // ✅ TOGGLE TASK (ONLY TOUCH tasks)
+  toggleTask: (id) =>
+    set((state) => {
+      const task = state.tasks[id];
+      if (!task) return state;
 
-      // Update Date
-      const updatedTask = { ...task, date: newDate };
+      return {
+        tasks: {
+          ...state.tasks,
+          [id]: {
+            ...task,
+            completed: !task.completed,
+          },
+        },
+      };
+    }),
 
-      // get tasks of target column
-      const columnTasks = tasks.filter((task) => task.date === newDate);
+  // ✅ MOVE TASK (PURE ID-BASED)
+  moveTask: (id, toColumn, toIndex) =>
+    set((state) => {
+      const columns = {
+        yesterday: [...state.columns.yesterday],
+        today: [...state.columns.today],
+        tomorrow: [...state.columns.tomorrow],
+      };
 
-      // Adjust index if same column
-      if (fromDate === newDate) {
-        const oldColumnIndex = state.tasks
-          .filter((task) => task.date === newDate)
-          .findIndex((task) => task.id === id);
+      // 🛑 guard invalid column
+      if (!columns[toColumn]) {
+        console.error("Invalid column:", toColumn);
+        return state;
+      }
 
-        if (oldColumnIndex < newIndex) {
-          newIndex--;
+      let fromColumn: ColumnKey | null = null;
+      let fromIndex = -1;
+
+      // 🔍 find + remove
+      for (const key of Object.keys(columns) as ColumnKey[]) {
+        const index = columns[key].indexOf(id);
+
+        if (index !== -1) {
+          fromColumn = key;
+          fromIndex = index;
+          columns[key].splice(index, 1);
+          break;
         }
       }
 
-      // Clamp newIndex to valid range
-      newIndex = Math.max(0, Math.min(newIndex, columnTasks.length));
+      if (!fromColumn) return state;
 
-      // Insert Task at new position
-      columnTasks.splice(newIndex, 0, updatedTask);
+      const target = columns[toColumn];
 
-      // merge back
-      const otherTasks = tasks.filter((task) => task.date !== newDate);
+      // 🧠 fix same-column downward shift
+      let insertIndex = toIndex;
+      if (fromColumn === toColumn && fromIndex < toIndex) {
+        insertIndex -= 1;
+      }
 
-      return { tasks: [...otherTasks, ...columnTasks] };
+      // 🧱 clamp
+      insertIndex = Math.max(0, Math.min(insertIndex, target.length));
+
+      target.splice(insertIndex, 0, id);
+
+      return { columns };
     }),
 }));
 

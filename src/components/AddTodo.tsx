@@ -1,17 +1,26 @@
-import { useState, type FormEvent } from "react";
+import { useState } from "react";
 import useTaskStore from "../store/useTaskStore";
+import type { ColumnKey } from "../types/Task";
 
-export default function AddTodo({ date }: { date: string }) {
+export default function AddTodo({ column }: { column: ColumnKey }) {
   const [text, setText] = useState("");
   const addTask = useTaskStore((state) => state.addTask);
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (text.trim()) {
-      addTask(text, date);
-      setText("");
-    }
+    const trimmed = text.trim();
+    if (!trimmed) return;
+
+    const newTask = {
+      id: crypto.randomUUID(),
+      text: trimmed,
+      completed: false,
+    };
+
+    addTask(column, newTask);
+    setText("");
   };
+
   return (
     <form onSubmit={handleSubmit} className="flex justify-between p-2">
       <input

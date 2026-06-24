@@ -2,13 +2,17 @@ export type Task = {
   id: string;
   text: string;
   completed: boolean;
-  date: string;
 };
 
+export type ColumnKey = "yesterday" | "today" | "tomorrow";
+
 export type TaskStore = {
-  tasks: Task[];
-  addTask: (text: string, date: string) => void;
+  tasks: Record<string, Task>;
+  columns: Record<ColumnKey, string[]>;
+
+  // actions
+  addTask: (column: ColumnKey, task: Task) => void;
   deleteTask: (id: string) => void;
   toggleTask: (id: string) => void;
-  moveTask: (id: string, newDate: string, newIndex: number) => void;
+  moveTask: (id: string, toColumn: ColumnKey, toIndex: number) => void;
 };
