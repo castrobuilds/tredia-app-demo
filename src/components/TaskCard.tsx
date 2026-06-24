@@ -2,41 +2,72 @@ import useTaskStore from "../store/useTaskStore";
 import { motion } from "framer-motion";
 import { type Task } from "../types/Task";
 
-export default function TaskCard({ task }: { task: Task }) {
+export default function TaskCard({
+  task,
+  index,
+}: {
+  task: Task;
+  index: number;
+}) {
   const removeTask = useTaskStore((state) => state.deleteTask);
   const toggleTask = useTaskStore((state) => state.toggleTask);
+  const moveTask = useTaskStore((state) => state.moveTask);
 
   const variants = {
     initial: { opacity: 0, y: 50 },
     animate: { opacity: 1, y: 0 },
   };
 
+  const handleDragStart = (e: React.DragEvent<HTMLDivElement>) => {
+    e.dataTransfer.setData("taskId", task.id);
+    e.dataTransfer.setData("fromIndex", index.toString());
+    e.dataTransfer.setData("fromDate", task.date);
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+
+    const taskId = e.dataTransfer.getData("taskId");
+    if (!taskId) return;
+
+    moveTask(taskId, task.date, index);
+  };
+
   return (
-    <motion.li
-      variants={variants}
-      initial="initial"
-      animate="animate"
-      className="flex items-center p-2"
-      layout
+    <div
+      draggable
+      onDragStart={handleDragStart}
+      onDragOver={(e) => e.preventDefault()}
+      onDrop={handleDrop}
     >
-      <input
-        type="checkbox"
-        checked={task.completed}
-        onChange={() => toggleTask(task.id)}
-        className="h-5 w-5"
-      />
-      <span
-        className={`flex-1 ml-2 ${task.completed ? "line-through text-gray-500" : ""}`}
+      <motion.li
+        layout
+        variants={variants}
+        initial="initial"
+        animate="animate"
+        className="flex items-center p-2"
       >
-        {task.text}
-      </span>
-      <button
-        onClick={() => removeTask(task.id)}
-        className="px-2 py-1 bg-red-500 text-white rounded"
-      >
-        x
-      </button>
-    </motion.li>
+        <input
+          type="checkbox"
+          checked={task.completed}
+          onChange={() => toggleTask(task.id)}
+          className="h-5 w-5"
+        />
+        <span
+          className={`flex-1 ml-2 ${task.completed ? "line-through text-gray-500" : ""}`}
+        >
+          {task.text}
+        </span>
+        <div>
+          <button
+            onClick={() => removeTask(task.id)}
+            className="px-2 py-1 bg-red-500 text-white rounded"
+          >
+            x
+          </button>
+        </div>
+      </motion.li>
+    </div>
   );
 }
 

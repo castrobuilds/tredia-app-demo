@@ -10,5 +10,5 @@ export type TaskStore = {
   addTask: (text: string, date: string) => void;
   deleteTask: (id: string) => void;
   toggleTask: (id: string) => void;
-  moveTask: (id: string, newIndex: number) => void;
+  moveTask: (id: string, newDate: string, newIndex: number) => void;
 };
