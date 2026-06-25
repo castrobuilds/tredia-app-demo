@@ -1,56 +1,75 @@
 import {
   closestCenter,
   DndContext,
+  DragOverlay,
   PointerSensor,
   useSensor,
   useSensors,
-  type DragEndEvent,
+  type DragOverEvent,
+  type DragStartEvent,
 } from "@dnd-kit/core";
 
+import { useState } from "react";
 import useTaskStore from "./store/useTaskStore";
 import Board from "./components/Board";
 import { findColumnOfTask, findIndexInColumn } from "./utils/utils";
 import type { ColumnKey } from "./types/Task";
+import TaskCard from "./components/TaskCard";
 
 export default function App() {
   const moveTask = useTaskStore((s) => s.moveTask);
   const columns = useTaskStore((s) => s.columns);
 
+  // Drag States
+  const [activeId, setActiveId] = useState<string | null>(null);
+  const [overId, setOverId] = useState<string | null>(null);
+
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
   );
 
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
+  const handleDragStart = (event: DragStartEvent) => {
+    setActiveId(event.active.id as string);
+  };
 
+  const handleDragOver = (event: DragOverEvent) => {
+    const { active, over } = event;
     if (!over) return;
 
     const activeId = active.id as string;
     const overId = over.id as string;
 
-    // Find source column
+    setOverId(overId);
+
     const fromColumn = findColumnOfTask(activeId);
     if (!fromColumn) return;
 
     let toColumn: ColumnKey | null = null;
-    let toIndex = 0;
+    let toIndex = -1;
 
+    // 1. Hoverting a column
     if (overId in columns) {
       toColumn = overId as ColumnKey;
-      toIndex = columns[toColumn].length;
+      toIndex = columns[toColumn].length; // insert at the end
     }
-    // Drop on a task
+
+    // 2. Hovering a task
     else {
       toColumn = findColumnOfTask(overId);
       if (!toColumn) return;
 
-      toIndex = findIndexInColumn(toColumn, overId);
+      const overIndex = findIndexInColumn(toColumn, overId);
+
+      const isBelow = event.delta.y > 0;
+
+      toIndex = overIndex + (isBelow ? 1 : 0);
     }
 
     if (!toColumn) return;
 
-    //prevent useless updates
     const fromIndex = findIndexInColumn(fromColumn, activeId);
+
+    // Prevent useless updates
     if (fromColumn === toColumn && fromIndex === toIndex) return;
 
     moveTask(activeId, toColumn, toIndex);
@@ -60,9 +79,19 @@ export default function App() {
     <DndContext
       sensors={sensors}
       collisionDetection={closestCenter}
-      onDragEnd={handleDragEnd}
+      onDragStart={handleDragStart}
+      onDragOver={handleDragOver}
+      onDragEnd={() => {
+        setActiveId(null);
+        setOverId(null);
+      }}
     >
-      <Board />
+      <Board activeId={activeId} overId={overId} />
+
+      {/* Floating Card */}
+      <DragOverlay>
+        {activeId ? <TaskCard id={activeId} overlay /> : null}
+      </DragOverlay>
     </DndContext>
   );
 }

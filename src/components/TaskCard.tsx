@@ -1,10 +1,15 @@
 import useTaskStore from "../store/useTaskStore";
-import { type ColumnKey, type Task } from "../types/Task";
 import { motion } from "framer-motion";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
-export default function TaskCard({ id }: { id: string }) {
+export default function TaskCard({
+  id,
+  overlay = false,
+}: {
+  id: string;
+  overlay?: boolean;
+}) {
   // Get task data
   const task = useTaskStore((state) => state.tasks[id]);
   if (!task) return null;
@@ -20,7 +25,7 @@ export default function TaskCard({ id }: { id: string }) {
     transform,
     transition,
     isDragging,
-  } = useSortable({ id });
+  } = useSortable({ id, data: { type: "task" } });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -42,7 +47,7 @@ export default function TaskCard({ id }: { id: string }) {
       variants={variants}
       initial="initial"
       animate="animate"
-      className={`flex items-center p-2 bg-white rounded-md mb-2 cursor-grab active:cursor-grabbing ${isDragging ? "opacity-50" : ""}`}
+      className={`flex items-center p-2 bg-white rounded-md mb-2 cursor-grab active:cursor-grabbing ${isDragging ? "opacity-50" : ""} ${overlay ? "shadow-xl scale-105 rotate-1" : ""}`}
     >
       <input
         type="checkbox"

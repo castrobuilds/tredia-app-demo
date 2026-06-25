@@ -23,3 +23,16 @@ export const findIndexInColumn = (
 
   return columns[column].indexOf(taskId);
 };
+
+export function findContainer(
+  columns: Record<ColumnKey, string[]>,
+  id: string,
+): ColumnKey | null {
+  if (id in columns) return id as ColumnKey;
+
+  for (const key of Object.keys(columns) as ColumnKey[]) {
+    if (columns[key].includes(id)) return key;
+  }
+
+  return null;
+}

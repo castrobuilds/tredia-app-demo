@@ -1,6 +1,12 @@
 import Column from "./Column";
 
-export default function Board() {
+export default function Board({
+  activeId,
+  overId,
+}: {
+  activeId: string | null;
+  overId: string | null;
+}) {
   return (
     <main className="p-6 bg-slate-100">
       <div className="w-full mx-auto h-screen">
@@ -9,10 +15,15 @@ export default function Board() {
             <h1 className="text-2xl font-bold text-center">Tredia App</h1>
           </div>
 
-          <div className="flex w-full mx-auto gap-6">
-            <Column column="yesterday" />
-            <Column column="today" />
-            <Column column="tomorrow" />
+          <div className="grid grid-cols-3 gap-4">
+            {["yesterday", "today", "tomorrow"].map((col) => (
+              <Column
+                key={col}
+                column={col as any}
+                activeId={activeId}
+                overId={overId}
+              />
+            ))}
           </div>
         </div>
       </div>
