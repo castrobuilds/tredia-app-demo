@@ -8,36 +8,13 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 
-export default function Column({
-  column,
-  activeId,
-  overId,
-}: {
-  column: ColumnKey;
-  activeId: string | null;
-  overId: string | null;
-}) {
+export default function Column({ column }: { column: ColumnKey }) {
   const taskIds = useTaskStore((s) => s.columns[column]);
 
   // Column Droppable logic
   const { setNodeRef } = useDroppable({
     id: column,
   });
-
-  // Insertion index
-  const getInsertIndex = () => {
-    if (!overId) return null;
-
-    // ig hovering a column → insert at the end
-    if (overId === column) return taskIds.length;
-
-    // hovering a task → insert before it
-    const index = taskIds.indexOf(overId);
-
-    return index === -1 ? taskIds.length : index;
-  };
-
-  const insertIndex = getInsertIndex();
 
   return (
     <div
@@ -50,21 +27,11 @@ export default function Column({
 
       <SortableContext items={taskIds} strategy={verticalListSortingStrategy}>
         <ul className="mt-3 flex-1 overflow-y-auto">
-          {taskIds.map((id, index) => (
+          {taskIds.map((id) => (
             <div key={id}>
-              {/* 🔥 insertion indicator */}
-              {insertIndex === index && activeId && (
-                <div className="h-1 bg-blue-500 rounded mb-2 transition-all" />
-              )}
-
               <TaskCard id={id} />
             </div>
           ))}
-
-          {/* 🔥 end-of-list indicator */}
-          {insertIndex === taskIds.length && activeId && (
-            <div className="h-1 bg-blue-500 rounded mt-2" />
-          )}
         </ul>
       </SortableContext>
     </div>

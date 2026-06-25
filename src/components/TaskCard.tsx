@@ -25,7 +25,11 @@ export default function TaskCard({
     transform,
     transition,
     isDragging,
-  } = useSortable({ id, data: { type: "task" } });
+  } = useSortable({
+    id,
+    data: { type: "task" },
+    transition: { duration: 150, easing: "ease" },
+  });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -33,7 +37,7 @@ export default function TaskCard({
   };
 
   const variants = {
-    initial: { opacity: 0, y: 40 },
+    initial: { opacity: 0, y: 20 },
     animate: { opacity: 1, y: 0 },
   };
 
@@ -43,11 +47,10 @@ export default function TaskCard({
       style={style}
       {...attributes}
       {...listeners}
-      layout
       variants={variants}
       initial="initial"
       animate="animate"
-      className={`flex items-center p-2 bg-white rounded-md mb-2 cursor-grab active:cursor-grabbing ${isDragging ? "opacity-50" : ""} ${overlay ? "shadow-xl scale-105 rotate-1" : ""}`}
+      className={`flex items-center p-2 bg-white rounded-md mb-2 cursor-grab active:cursor-grabbing ${isDragging ? "opacity-0" : ""} ${overlay ? "shadow-xl scale-105 rotate-1" : ""}`}
     >
       <input
         type="checkbox"

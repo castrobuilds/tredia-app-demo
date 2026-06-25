@@ -1,5 +1,5 @@
 import {
-  closestCenter,
+  closestCorners,
   DndContext,
   DragOverlay,
   PointerSensor,
@@ -15,10 +15,11 @@ import Board from "./components/Board";
 import { findColumnOfTask, findIndexInColumn } from "./utils/utils";
 import type { ColumnKey } from "./types/Task";
 import TaskCard from "./components/TaskCard";
+import { shallow } from "zustand/shallow";
 
 export default function App() {
   const moveTask = useTaskStore((s) => s.moveTask);
-  const columns = useTaskStore((s) => s.columns);
+  const columns = useTaskStore((s) => s.columns, shallow);
 
   // Drag States
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -70,7 +71,7 @@ export default function App() {
     const fromIndex = findIndexInColumn(fromColumn, activeId);
 
     // Prevent useless updates
-    if (fromColumn === toColumn && fromIndex === toIndex) return;
+    if (fromColumn === toColumn && Math.abs(fromIndex - toIndex) === 0) return;
 
     moveTask(activeId, toColumn, toIndex);
   };
@@ -78,7 +79,7 @@ export default function App() {
   return (
     <DndContext
       sensors={sensors}
-      collisionDetection={closestCenter}
+      collisionDetection={closestCorners}
       onDragStart={handleDragStart}
       onDragOver={handleDragOver}
       onDragEnd={() => {
@@ -86,10 +87,10 @@ export default function App() {
         setOverId(null);
       }}
     >
-      <Board activeId={activeId} overId={overId} />
+      <Board />
 
       {/* Floating Card */}
-      <DragOverlay>
+      <DragOverlay dropAnimation={{ duration: 200, easing: "ease" }}>
         {activeId ? <TaskCard id={activeId} overlay /> : null}
       </DragOverlay>
     </DndContext>

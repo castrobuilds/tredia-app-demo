@@ -1,7 +1,7 @@
-import { create } from "zustand";
+import { createWithEqualityFn } from "zustand/traditional";
 import { type ColumnKey, type TaskStore } from "../types/Task";
 
-const useTaskStore = create<TaskStore>((set) => ({
+const useTaskStore = createWithEqualityFn<TaskStore>((set) => ({
   tasks: {},
 
   columns: {
