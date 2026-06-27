@@ -1,6 +1,7 @@
 import { createWithEqualityFn } from "zustand/traditional";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { type ColumnKey, type TaskStore } from "../types/Task";
+import { createDebouncedJSONStorage } from "./debouncedStorage";
 
 const useTaskStore = createWithEqualityFn<TaskStore>()(
   persist(
@@ -117,7 +118,7 @@ const useTaskStore = createWithEqualityFn<TaskStore>()(
     {
       name: "task-storage-v1",
 
-      storage: createJSONStorage(() => localStorage),
+      storage: createJSONStorage(() => createDebouncedJSONStorage(300)),
 
       partialize: (state) => ({
         tasks: state.tasks,
