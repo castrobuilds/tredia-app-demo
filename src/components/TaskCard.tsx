@@ -1,6 +1,6 @@
 import useTaskStore from "../store/useTaskStore";
 import { motion } from "framer-motion";
-import { useSortable } from "@dnd-kit/sortable";
+import { useSortable, defaultAnimateLayoutChanges } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
 export default function TaskCard({
@@ -28,7 +28,16 @@ export default function TaskCard({
   } = useSortable({
     id,
     data: { type: "task" },
-    transition: { duration: 150, easing: "ease" },
+    transition: { duration: 180, easing: "cubic-bezier(0.25, 1, 0.5, 1)" },
+    animateLayoutChanges: (args) => {
+      const { isSorting, isDragging } = args;
+
+      if (isSorting || isDragging) {
+        return defaultAnimateLayoutChanges(args);
+      }
+
+      return true;
+    },
   });
 
   const style = {
