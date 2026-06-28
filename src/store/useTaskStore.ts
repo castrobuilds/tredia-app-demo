@@ -2,6 +2,7 @@ import { createWithEqualityFn } from "zustand/traditional";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { type ColumnKey, type TaskStore } from "../types/Task";
 import { createDebouncedJSONStorage } from "./debouncedStorage";
+import { getToday } from "../utils/dateUtils";
 
 const useTaskStore = createWithEqualityFn<TaskStore>()(
   persist(
@@ -15,6 +16,7 @@ const useTaskStore = createWithEqualityFn<TaskStore>()(
       },
 
       _hasHydrated: false,
+      lastUpdatedDay: getToday(),
 
       // ACTIONS
       setHasHydrated: (state: boolean) => set({ _hasHydrated: state }),
@@ -112,6 +114,25 @@ const useTaskStore = createWithEqualityFn<TaskStore>()(
 
           return { columns };
         }),
+
+      // SHIFT DAY
+      shiftDay: () => {
+        const today = getToday();
+
+        const { lastUpdatedDay, columns } = get();
+
+        if (lastUpdatedDay === today) return;
+
+        //SHIFT
+        set({
+          columns: {
+            yesterday: columns.today,
+            today: columns.tomorrow,
+            tomorrow: [],
+          },
+          lastUpdatedDay: today,
+        });
+      },
     }),
 
     // Persist Configuration
@@ -123,6 +144,7 @@ const useTaskStore = createWithEqualityFn<TaskStore>()(
       partialize: (state) => ({
         tasks: state.tasks,
         columns: state.columns,
+        lastUpdatedDay: state.lastUpdatedDay,
       }),
 
       version: 1,
@@ -143,6 +165,7 @@ const useTaskStore = createWithEqualityFn<TaskStore>()(
       },
 
       onRehydrateStorage: () => (state, error) => {
+        state?.shiftDay();
         if (error) {
           console.error("Error during rehydration:", error);
         } else {

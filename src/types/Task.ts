@@ -10,6 +10,7 @@ export type TaskStore = {
   tasks: Record<string, Task>;
   columns: Record<ColumnKey, string[]>;
   _hasHydrated: boolean;
+  lastUpdatedDay: string;
 
   // actions
   setHasHydrated: (state: boolean) => void;
@@ -17,4 +18,5 @@ export type TaskStore = {
   deleteTask: (id: string) => void;
   toggleTask: (id: string) => void;
   moveTask: (id: string, toColumn: ColumnKey, toIndex: number) => void;
+  shiftDay: () => void;
 };
