@@ -15,6 +15,7 @@ import type { ColumnKey } from "./types/Task";
 import TaskCard from "./components/TaskCard";
 import { shallow } from "zustand/shallow";
 import { useUIStore } from "./store/useUIStore";
+import NavBar from "./components/NavBar";
 
 export default function App() {
   const moveTask = useTaskStore((s) => s.moveTask);
@@ -79,6 +80,7 @@ export default function App() {
       onDragOver={undefined}
       onDragEnd={handleDragEnd}
     >
+      <NavBar />
       <Board />
 
       {/* Floating Card */}
