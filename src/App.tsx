@@ -9,15 +9,15 @@ import {
 } from "@dnd-kit/core";
 
 import useTaskStore from "./store/useTaskStore";
-import Board from "./components/Board";
 import { findColumnOfTask, findIndexInColumn } from "./utils/utils";
 import type { ColumnKey } from "./types/Task";
 import TaskCard from "./components/TaskCard";
 import { shallow } from "zustand/shallow";
 import { useUIStore } from "./store/useUIStore";
 import NavBar from "./components/NavBar";
-import TodayView from "./components/TodayView";
 import DateBar from "./components/DateBar";
+import TasksView from "./components/TasksView";
+import SideDrawer from "./components/SideDrawer";
 
 export default function App() {
   const moveTask = useTaskStore((s) => s.moveTask);
@@ -87,7 +87,8 @@ export default function App() {
         <DateBar />
 
         <main className="relative flex-1 overflow-hidden">
-          <TodayView />
+          <TasksView column="today" />
+          <SideDrawer />
         </main>
       </div>
 

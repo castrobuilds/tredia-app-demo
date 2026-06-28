@@ -51,7 +51,8 @@ export default function TaskCard({
   };
 
   return (
-    <motion.li
+    <motion.div
+      className={`group flex items-center gap-3 px-4 py-3 bg-white rounded-xl min-w-md cursor-grab active:cursor-grabbing ${isDragging ? "opacity-0" : ""} ${overlay ? "shadow-xl scale-105 rotate-1" : ""}`}
       ref={setNodeRef}
       style={style}
       {...attributes}
@@ -59,7 +60,43 @@ export default function TaskCard({
       variants={variants}
       initial="initial"
       animate="animate"
-      className={`flex items-center p-2 bg-white rounded-md mb-2 cursor-grab active:cursor-grabbing ${isDragging ? "opacity-0" : ""} ${overlay ? "shadow-xl scale-105 rotate-1" : ""}`}
+    >
+      {/* Checkbox */}
+      <button
+        onClick={() => toggleTask(id)}
+        className={`w-4 h-4 border rounded-full flex items-center justify-center group-hover:border-blue-500 transition-colors ${task.completed ? "bg-black border-black" : "border-stone-300"}`}
+      >
+        {task.completed && <div className="w-2 h-2 bg-white rounded-full" />}
+      </button>
+
+      {/* Task Text */}
+      <div
+        className={`flex-1 text-md ${task.completed ? "line-through text-gray-500" : ""}`}
+      >
+        {task.text}
+      </div>
+
+      {/* Options Button */}
+      <button
+        onClick={() => removeTask(id)}
+        className="opacity-0 group-hover:opacity-100 text-neutral-400 hover:text-red-500 transition"
+      >
+        x
+      </button>
+    </motion.div>
+  );
+}
+
+/*
+<motion.div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+      variants={variants}
+      initial="initial"
+      animate="animate"
+      className={`flex items-center p-2 bg-white rounded-md mb-2 min-w-md cursor-grab active:cursor-grabbing ${isDragging ? "opacity-0" : ""} ${overlay ? "shadow-xl scale-105 rotate-1" : ""}`}
     >
       <input
         type="checkbox"
@@ -80,6 +117,5 @@ export default function TaskCard({
           x
         </button>
       </div>
-    </motion.li>
-  );
-}
+    </motion.div>
+    */

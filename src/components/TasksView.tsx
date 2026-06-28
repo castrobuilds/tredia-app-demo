@@ -1,36 +1,32 @@
-import TaskCard from "./TaskCard";
-import AddTodo from "./AddTodo";
+import { useDroppable } from "@dnd-kit/core";
 import useTaskStore from "../store/useTaskStore";
 import type { ColumnKey } from "../types/Task";
-import { useDroppable } from "@dnd-kit/core";
+import AddTodo from "./AddTodo";
 import {
   SortableContext,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
+import TaskCard from "./TaskCard";
 
-export default function Column({ column }: { column: ColumnKey }) {
+export default function TasksView({ column }: { column: ColumnKey }) {
   const taskIds = useTaskStore((s) => s.columns[column]);
 
   // Column Droppable logic
   const { setNodeRef } = useDroppable({
     id: column,
   });
-
   return (
-    <div
-      ref={setNodeRef}
-      className="bg-slate-200 p-4 rounded-lg h-[80vh] flex flex-col"
-    >
-      <h2 className="text-center font-bold mb-2">{column}</h2>
+    <div className="h-full flex flex-col items-center pt-16" ref={setNodeRef}>
+      <p className="text-sm text-neutral-500 mb-8">Focus on what matters.</p>
 
       <AddTodo column={column} />
 
       <SortableContext items={taskIds} strategy={verticalListSortingStrategy}>
-        <ul className="mt-3 flex-1 overflow-y-auto">
+        <ul className="mt-3 flex-1 overflow-y-auto space-y-2">
           {taskIds.map((id) => (
-            <div key={id}>
+            <li key={id}>
               <TaskCard id={id} />
-            </div>
+            </li>
           ))}
         </ul>
       </SortableContext>

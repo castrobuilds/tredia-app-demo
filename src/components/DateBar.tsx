@@ -1,11 +1,15 @@
 import { MdArrowBackIosNew, MdArrowForwardIos } from "react-icons/md";
+import { useUIStore } from "../store/useUIStore";
 
 export default function DateBar() {
+  const { activeDrawer, openDrawer, closeDrawer } = useUIStore();
   return (
     <div className="flex items-center justify-between px-8 py-2 border-b border-stone-200 bg-stone-100 shadow-md">
       {/* Yesterday Button */}
       <button
-        onClick={() => console.log("Yesterday clicked")}
+        onClick={() =>
+          activeDrawer === "yesterday" ? closeDrawer() : openDrawer("yesterday")
+        }
         className="flex items-center space-x-4 hover:bg-stone-200 transition-colors rounded-md px-3 py-2 cursor-pointer"
       >
         <MdArrowBackIosNew size={24} />
@@ -20,7 +24,7 @@ export default function DateBar() {
       </button>
       {/* Today Button */}
       <button
-        onClick={() => console.log("Today clicked")}
+        onClick={closeDrawer}
         className="flex items-center space-x-4 hover:bg-stone-200 transition-colors rounded-md px-3 py-2 cursor-pointer"
       >
         <span className="text-2xl font-medium text-gray-700 hover:text-black">
@@ -29,7 +33,9 @@ export default function DateBar() {
       </button>
       {/* Tomorrow Button */}
       <button
-        onClick={() => console.log("Tomorrow clicked")}
+        onClick={() =>
+          activeDrawer === "tomorrow" ? closeDrawer() : openDrawer("tomorrow")
+        }
         className="flex items-center space-x-4 hover:bg-stone-200 transition-colors rounded-md px-3 py-2 cursor-pointer"
       >
         <div className="flex flex-col items-center">
