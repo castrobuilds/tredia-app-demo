@@ -16,6 +16,8 @@ import TaskCard from "./components/TaskCard";
 import { shallow } from "zustand/shallow";
 import { useUIStore } from "./store/useUIStore";
 import NavBar from "./components/NavBar";
+import TodayView from "./components/TodayView";
+import DateBar from "./components/DateBar";
 
 export default function App() {
   const moveTask = useTaskStore((s) => s.moveTask);
@@ -80,8 +82,14 @@ export default function App() {
       onDragOver={undefined}
       onDragEnd={handleDragEnd}
     >
-      <NavBar />
-      <Board />
+      <div className="h-screen flex flex-col bg-neutral-50">
+        <NavBar />
+        <DateBar />
+
+        <main className="relative flex-1 overflow-hidden">
+          <TodayView />
+        </main>
+      </div>
 
       {/* Floating Card */}
       <DragOverlay dropAnimation={{ duration: 200, easing: "ease" }}>
